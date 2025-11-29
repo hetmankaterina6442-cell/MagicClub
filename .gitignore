@@ -8,8 +8,6 @@ __pycache__/
 
 # sqlite/media
 db.sqlite3
-media/
-
 
 # OS/IDE
 .DS_Store
