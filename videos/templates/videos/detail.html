@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ item.title }} — Відео{% endblock %}
+{% block content %}
+<article class="card">
+  <h1 class="post-title">{{ item.title }}</h1>
+  {% if item.description %}<p class="muted">{{ item.description }}</p>{% endif %}
+
+  <div class="video-frame mt-3">
+    {% if item.is_youtube %}
+      <iframe
+        src="{{ item.player_url }}"
+        title="{{ item.title }}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    {% else %}
+      <video
+        src="{{ item.player_url }}"
+        controls
+        {% if item.poster_url %}poster="{{ item.poster_url }}"{% endif %}
+        playsinline
+      ></video>
+    {% endif %}
+  </div>
+</article>
+
+<style>
+/* 16:9 responsive container */
+.video-frame{
+  position:relative; padding-top:56.25%;
+  border-radius:12px; overflow:hidden; background:#000;
+}
+.video-frame iframe,
+.video-frame video{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block; border:0;
+}
+</style>
+{% endblock %}

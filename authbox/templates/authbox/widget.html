@@ -1,0 +1,52 @@
+{% load static authbox_extras %}
+<link rel="stylesheet" href="{% static 'authbox/authbox.css' %}">
+
+<div class="abox">
+  <!-- декоративна «блакитна дужка» зверху -->
+  <div class="abox-cap">
+    <span class="cap-line"></span>
+  </div>
+
+  <form class="abox-form" method="post" action="{% url 'authbox:login' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next|default:request.path }}">
+
+    <div class="abox-row">
+      <label class="abox-label">Fairy Name:</label>
+      {{ form.username|add_class:"abox-input" }}
+    </div>
+
+    <div class="abox-row">
+      <label class="abox-label">Password:</label>
+      {{ form.password|add_class:"abox-input" }}
+    </div>
+
+    <div class="abox-actions">
+      <button class="btn-login" type="submit">login</button>
+    </div>
+
+    <p class="abox-forgot">
+      <span class="arrow">›</span>
+      <a href="#">I forget my personal data</a>
+    </p>
+
+    <!-- ваш котик з крильцями -->
+    <img class="abox-cat" src="{% static 'authbox/mascot-login.png' %}" alt="">
+  </form>
+
+  <!-- нижній промо-блок -->
+  <div class="abox-promo" style="background-image:url('{% static 'authbox/Image 3.png' %}');">
+    <div class="promo-inner">
+      <div class="promo-copy">
+        <div class="p-small">Haven't you<br>joined yet ?</div>
+        <div class="p-big">Register now with<br><strong>Winx Club</strong></div>
+      </div>
+
+      <!-- ваш звірятко праворуч -->
+      <img class="promo-pet" src="{% static 'authbox/Image 59.png' %}" alt="">
+
+      <!-- якщо нема сторінки реєстрації — можна тимчасово поставити href="#" -->
+      <a class="btn-signup" href="/accounts/signup/">sign up</a>
+    </div>
+  </div>
+</div>

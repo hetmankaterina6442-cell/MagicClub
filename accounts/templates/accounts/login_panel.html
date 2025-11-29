@@ -1,0 +1,53 @@
+{# templates/accounts/login_panel.html #}
+{% load static %}
+<link rel="stylesheet" href="{% static 'accounts/auth_panel.css' %}">
+
+<div class="auth-panel">
+  {% if user.is_authenticated %}
+    <div class="auth-inner is-auth">
+      <div class="auth-greeting">
+        <p class="hello">Вітаємо, <strong>{{ user.username }}</strong>!</p>
+        <p class="tiny">Готові до магії сьогодні? ✨</p>
+      </div>
+
+      <div class="auth-actions">
+        <a class="btn pink" href="{% url 'accounts:logout' %}">вийти</a>
+        <a class="btn outline" href="/profile/">мій профіль</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="auth-inner">
+      <div class="curve"></div>
+
+      <form method="post" action="{% url 'accounts:login' %}">
+        {% csrf_token %}
+        <label for="id_username">Ім’я феї:</label>
+        {{ form.username }}
+
+        <label for="id_password">Пароль:</label>
+        {{ form.password }}
+
+        <button type="submit" class="btn pink btn-login">увійти</button>
+      </form>
+
+      <img class="pet pet-left"
+           src="{% static 'accounts/img/fairy_pet_left.png' %}"
+           alt="феє-пиксі">
+
+      <a class="forgot" href="{% url 'accounts:password_reset' %}">
+        <span class="arrow">❯</span> Забули дані для входу?
+      </a>
+    </div>
+
+    <div class="signup-card">
+      <div class="snow"></div>
+      <p class="q">Ще не з нами?</p>
+      <p class="lead">Зареєструйтеся у <strong>Winx Club</strong></p>
+      <a class="btn pink pill" href="{% url 'accounts:signup' %}">зареєструватися</a>
+
+      <img class="pet pet-right"
+           src="{% static 'accounts/img/fairy_pet_right.png' %}"
+           alt="синій піксі">
+    </div>
+  {% endif %}
+</div>

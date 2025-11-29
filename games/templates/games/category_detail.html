@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ category.title }} — Ігри{% endblock %}
+{% block content %}
+<main class="container">
+  <nav class="muted" style="margin-top:6px">
+    <a href="{% url 'games:theme_detail' theme.slug %}">{{ theme.title }}</a> / {{ category.title }}
+  </nav>
+
+  <h2 class="section-title">Ігри</h2>
+  <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+    {% for g in games %}
+      <a class="card post" href="{% url 'games:game_detail' g.slug %}" style="text-decoration:none">
+        <div class="post-thumb" style="width:140px;min-width:140px;height:96px">
+          {% if g.cover %}<img src="{{ g.cover.url }}" alt="{{ g.title }}"
+            style="width:100%;height:100%;object-fit:cover;border-radius:12px">{% endif %}
+        </div>
+        <div class="post-body">
+          <h3 class="post-title">{{ g.title }}</h3>
+          {% if g.description %}<p class="muted">{{ g.description|truncatewords:22 }}</p>{% endif %}
+          <div class="meta"><span class="badge">Ruffle</span></div>
+        </div>
+      </a>
+      {% empty %}
+      <p class="muted">Ігор поки немає.</p>
+      {% endfor %}
+  </div>
+</main>
+{% endblock %}

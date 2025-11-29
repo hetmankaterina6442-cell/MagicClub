@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Реєстрація{% endblock %}
+
+{% block content %}
+<main class="container">
+
+  <div class="reg-card">
+    <div class="reg-head">Обліковий запис користувача</div>
+
+    <form method="post" class="reg-form">
+      {% csrf_token %}
+      <div class="reg-grid">
+        <label>Прізвисько *</label>{{ form.display_name }}
+        <label>Електронна пошта *</label>{{ form.email }}
+        <label>Країна</label>{{ form.country }}
+        <label>Стать</label>{{ form.gender }}
+        <label>Вік *</label>{{ form.age_group }}
+        <label>День народження</label>{{ form.birth_date }}
+        <label>Ім’я користувача *</label>{{ form.username }}
+        <label>Пароль *</label>{{ form.password1 }}
+        <label>Повтор пароля *</label>{{ form.password2 }}
+      </div>
+
+      <label class="reg-check">
+        {{ form.newsletter_opt_in }} Я хочу отримувати інформацію про останні новини та події Вінкс-клубу
+      </label>
+
+      <div class="reg-tos">
+        <div class="reg-tos-head">Умови використання</div>
+        <div class="reg-tos-body">
+          {% include "profiles/_tos.html" %}
+        </div>
+      </div>
+
+      <label class="reg-check must">
+        {{ form.accept_terms }} Я погоджуюся з цими умовами
+      </label>
+
+      <button class="reg-submit" type="submit">Створити новий обліковий запис</button>
+    </form>
+  </div>
+
+</main>
+{% endblock %}

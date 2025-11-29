@@ -1,0 +1,81 @@
+{% load static %}
+
+<div class="cmt-card compact" id="comments">
+  {# Шапка #}
+  <div class="cmt-cap">
+    <span class="cmt-title">Коментарі</span>
+    <span class="cmt-count">{{ comments|length }}</span>
+  </div>
+
+  {# Список коментарів #}
+  {% if comments %}
+    <ul class="cmt-list">
+      {% for c in comments %}
+        <li class="cmt-item">
+          <div class="cmt-avatar">
+            {% if c.user and c.user.profile and c.user.profile.avatar %}
+              <img src="{{ c.user.profile.avatar.url }}" alt="{% if c.user %}{{ c.user.username }}{% else %}avatar{% endif %}">
+            {% else %}
+              <img src="{% static 'core/img/avatars/default.png' %}" alt="avatar">
+            {% endif %}
+          </div>
+
+          <div class="cmt-body">
+            <div class="cmt-meta">
+              <strong class="cmt-author">
+                {% if c.display_name %}
+                  {{ c.display_name }}
+                {% elif c.user %}
+                  {{ c.user.username }}
+                {% else %}
+                  Гість
+                {% endif %}
+              </strong>
+              <time class="cmt-time" datetime="{{ c.created_at|date:'c' }}">
+                {{ c.created_at|date:"j E Y, H:i" }}
+              </time>
+            </div>
+            <p class="cmt-text">{{ c.body|linebreaksbr }}</p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="cmt-empty">Поки що немає коментарів. Будь першим!</p>
+  {% endif %}
+
+  {# Форма: тільки для авторизованих #}
+  {% if request.user.is_authenticated %}
+    <form class="cmt-form is-compact" action="{% url 'core:post_comment' article.slug %}" method="post">
+      {% csrf_token %}
+      <h3 class="cmt-form-title">Залишити коментар</h3>
+
+      {# Якщо у формі є поле display_name і воно не приховане — покажемо #}
+      {% if comment_form.display_name and not comment_form.display_name.is_hidden %}
+        <div class="cmt-row">
+          {{ comment_form.display_name }}
+          {{ comment_form.display_name.errors }}
+        </div>
+      {% endif %}
+
+      <div class="cmt-row">
+        {{ comment_form.body }}
+        {{ comment_form.body.errors }}
+      </div>
+
+      {% if comment_form.non_field_errors %}
+        <div class="cmt-errors">{{ comment_form.non_field_errors }}</div>
+      {% endif %}
+
+      <button class="cmt-submit" type="submit">Надіслати</button>
+    </form>
+  {% else %}
+    <div class="cmt-form is-compact" style="text-align:center">
+      <h3 class="cmt-form-title">Залишити коментар</h3>
+      <p class="muted" style="margin:0 0 10px">Щоб додати коментар, увійди до акаунта.</p>
+      <a class="btn" href="{% url 'core:index' %}">Увійти</a>
+      <span class="dot"></span>
+      <a class="btn" href="{% url 'profiles:register' %}">Зареєструватися</a>
+    </div>
+  {% endif %}
+</div>

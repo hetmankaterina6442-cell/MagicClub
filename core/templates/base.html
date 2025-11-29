@@ -1,0 +1,83 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Magic Club{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/theme.css' %}">
+  <link rel="icon" href="{% static 'core/img/ui/icon.png' %}">
+</head>
+
+<body>
+  {% if top_banner %}
+  <div class="site-top-ad">
+    <div class="container">
+      {% if top_banner.link_url %}
+        <a class="site-top-ad-link" href="{{ top_banner.link_url }}" {% if top_banner.open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}>
+          <img src="{{ top_banner.image.url }}" alt="{{ top_banner.alt|default:top_banner.title }}">
+        </a>
+      {% else %}
+        <img class="site-top-ad-img" src="{{ top_banner.image.url }}" alt="{{ top_banner.alt|default:top_banner.title }}">
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="{% url 'core:index' %}" class="brand logo"
+          style="display:flex;align-items:center;gap:10px;text-decoration:none">
+          <!-- <span class="butterfly"></span> -->
+          <img src="{% static 'core/img/logowinx4season.png' %}" width="80px" alt="" srcset="">
+          <span><span>Magic Club</span></span>
+        </a>
+
+        <nav class="main-nav">
+          {# використовуємо app_name, щоб підсвітити активний пункт #}
+          {% with app=request.resolver_match.app_name|default:'' %}
+          <a href="{% url 'core:index' %}" class="nav-link {% if app == 'core' %}active{% endif %}"><img
+              src="{% static 'core/img/home.png' %}" width="25px" alt="" srcset=""> Головна</a>
+
+          <a href="{% url 'videos:categories' %}" class="nav-link {% if app == 'videos' %}active{% endif %}"><img
+              src="{% static 'core/img/video.png' %}" width="25px" alt="" srcset=""> Відео</a>
+
+          <a href="{% url 'games:theme_list' %}" class="nav-link {% if app == 'games' %}active{% endif %}"><img
+              src="{% static 'core/img/game.png' %}" width="25px" alt="" srcset=""> Ігри</a>
+
+
+          <a href="{% url 'core:index' %}" class="nav-link {% if app == 'core' %}active{% endif %}">Форум</a>
+
+          <a class="nav-link" href="{% url 'core:quiz_list' %}">Тести</a>
+
+          <a href="{% url 'gallery:album_list' %}"
+            class="nav-link {% if app == 'gallery' %}active{% endif %}">Галерея</a>
+          {% endwith %}
+        </nav>
+      </div>
+    </div>
+  </header>
+
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© {{ now|date:"Y" }} Фейрі Клуб — фан‑сайт українською. Дизайн натхнений оригіналом.</p>
+      <nav class="footer-nav">
+        <a href="#">Правила</a>
+        <a href="#">Контакти</a>
+        <a href="#">FAQ</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="{% static 'core/js/main.js' %}"></script>
+</body>
+
+</html>

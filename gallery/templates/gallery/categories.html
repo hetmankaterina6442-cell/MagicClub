@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Галерея — Категорії{% endblock %}
+{% block content %}
+<h1 class="section-title">Категорії галереї</h1>
+<div class="cards">
+  {% for c in cats %}
+    <a href="{% url 'gallery:category' c.slug %}" class="card post" style="text-decoration:none;">
+      {% if c.icon %}<img src="{{ c.icon.url }}" class="post-thumb" style="object-fit:cover;">{% else %}
+      <div class="post-thumb" style="background:linear-gradient(135deg,#ffd4f0,#c8f);"></div>{% endif %}
+      <div class="post-body">
+        <h3 class="post-title">{{ c.title }}</h3>
+        <p class="muted">{{ c.albums.count }} альбом(ів)</p>
+      </div>
+    </a>
+  {% empty %}
+    <p class="muted">Створи категорію в адмінці.</p>
+  {% endfor %}
+</div>
+{% endblock %}

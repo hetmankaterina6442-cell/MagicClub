@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Редагувати профіль{% endblock %}
+{% block content %}
+<main class="container">
+  <form class="reg-card reg-form" method="post" enctype="multipart/form-data">
+    <div class="reg-head">Налаштування профілю</div>
+    {% csrf_token %}
+    <div class="reg-grid">
+      <label>Прізвисько</label>{{ form.display_name }}
+      <label>Країна</label>{{ form.country }}
+      <label>Стать</label>{{ form.gender }}
+      <label>Вік</label>{{ form.age_group }}
+      <label>День народження</label>{{ form.birth_date }}
+      <label>Аватар</label>{{ form.avatar }}
+      <label>Про себе</label>{{ form.bio }}
+    </div>
+    <label class="reg-check">{{ form.newsletter_opt_in }} Отримувати новини</label>
+    <button class="reg-submit" type="submit">Зберегти</button>
+  </form>
+</main>
+{% endblock %}

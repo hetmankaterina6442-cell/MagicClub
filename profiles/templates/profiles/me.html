@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Мій профіль{% endblock %}
+
+{% block content %}
+<main class="container">
+
+  <!-- HERO-КАРТКА З АВАТАРОМ -->
+  <section class="card profile-hero">
+    <div class="ph-cover"></div>
+    <div class="ph-inner">
+      <img class="ph-avatar"
+           src="{% if profile.avatar %}{{ profile.avatar.url }}{% else %}{% static 'profiles/default_avatar.png' %}{% endif %}"
+           alt="Аватар">
+
+      <div class="ph-info">
+        <h1 class="ph-name">{{ profile.display_name|default:user.username }}</h1>
+        <div class="ph-meta">
+          <span>@{{ user.username }}</span>
+          {% if user.email %}<span class="dot"></span><span>{{ user.email }}</span>{% endif %}
+          <span class="dot"></span><span>У клубі з {{ user.date_joined|date:"j E Y" }}</span>
+          {% if user.last_login %}
+            <span class="dot"></span><span>Останній вхід {{ user.last_login|date:"j E Y, H:i" }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <a class="ph-edit btn" href="{% url 'profiles:edit' %}">Редагувати</a>
+    </div>
+  </section>
+
+  <!-- ДЕТАЛІ ТА УПОДОБАННЯ -->
+  <section class="grid mt-3">
+    <div class="col col-6">
+      <div class="card profile-card">
+        <div class="card-head"><span>Основне</span></div>
+        <dl class="pf-list">
+          <div><dt>Країна</dt><dd>{{ profile.country|default:"—" }}</dd></div>
+          <div><dt>Місто</dt><dd>{{ profile.city|default:"—" }}</dd></div>
+          <div><dt>Стать</dt><dd>{{ profile.get_gender_display|default:"—" }}</dd></div>
+          <div><dt>Вік</dt>
+            <dd>
+              {% if profile.birth_date %}
+                {{ profile.birth_date|date:"j E Y" }} ({{ profile.birth_date|timesince }})
+              {% else %}
+                {{ profile.get_age_group_display|default:"—" }}
+              {% endif %}
+            </dd>
+          </div>
+          <div><dt>День народження</dt><dd>{{ profile.birth_date|date:"j E Y"|default:"—" }}</dd></div>
+        </dl>
+      </div>
+
+      <div class="card profile-card mt-3">
+        <div class="card-head"><span>Уподобання</span></div>
+        <dl class="pf-list">
+          <div><dt>Улюблена фея</dt><dd>{{ profile.favorite_fairy|default:"—" }}</dd></div>
+          <div><dt>Улюблений колір</dt><dd>{{ profile.favorite_color|default:"—" }}</dd></div>
+          <div><dt>Отримувати новини</dt>
+            <dd>{% if profile.newsletter_optin %}Так{% else %}Ні{% endif %}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="col col-6">
+      <div class="card profile-card">
+        <div class="card-head"><span>Про мене</span></div>
+        <p class="pf-bio">{{ profile.bio|default:"Поки що нічого не розповіли про себе." }}</p>
+      </div>
+
+      <div class="card profile-card mt-3">
+        <div class="card-head"><span>Обліковий запис</span></div>
+        <dl class="pf-list">
+          <div><dt>Email</dt><dd>{{ user.email|default:"—" }}</dd></div>
+          <div><dt>Імʼя користувача</dt><dd>{{ user.username }}</dd></div>
+          <div><dt>Приєднався</dt><dd>{{ user.date_joined|date:"j E Y, H:i" }}</dd></div>
+          <div><dt>Останній вхід</dt><dd>{{ user.last_login|date:"j E Y, H:i"|default:"—" }}</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Локальні стилі сторінки (акуратно, без зміни глобальних) -->
+<style>
+.profile-hero .ph-cover{
+  height: 90px;
+  background: linear-gradient(135deg,#ffb3e6,#a77bff);
+  border-top-left-radius: 16px;border-top-right-radius: 16px;
+}
+.profile-hero .ph-inner{
+  display:flex;align-items:center;gap:16px;padding:14px 16px 18px;
+  position:relative;margin-top:-40px;
+}
+.ph-avatar{
+  width:96px;height:96px;border-radius:50%;object-fit:cover;
+  border:4px solid #fff;box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+.ph-info{flex:1}
+.ph-name{margin:0;font-size:24px;line-height:1.2}
+.ph-meta{display:flex;flex-wrap:wrap;gap:8px;color:#6b6b8a;font-size:14px}
+.ph-edit{position:absolute;right:16px;top:14px}
+
+.pf-list{display:grid;gap:8px;margin:0;padding:12px}
+.pf-list > div{display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center}
+.pf-list dt{font-weight:800;color:#8d1fa1}
+.pf-bio{white-space:pre-line;margin:12px}
+
+@media (max-width:700px){
+  .pf-list > div{grid-template-columns:1fr}
+  .ph-inner{flex-direction:column;align-items:flex-start;margin-top:-48px}
+  .ph-edit{position:static;align-self:flex-end}
+}
+</style>
+{% endblock %}

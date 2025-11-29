@@ -1,0 +1,138 @@
+:root{
+  --auth-blue-1:#e1f3ff;
+  --auth-blue-2:#70b8e7;
+  --auth-blue-3:#1e9ad7;
+
+  --pink:#ff63b6;
+  --pink-dark:#ff2f98;
+
+  --box-bg:#fff;
+  --text:#3a3a44;
+  --muted:#9a8fa1;
+}
+
+/* контейнер */
+.abox{
+  width: 280px;
+  border-radius: 14px;
+  background: var(--box-bg);
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  border: 1px solid #e6d6e9;
+  overflow: hidden;
+  font-family: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  position: relative;
+}
+
+/* верхня «дужка» як на оригіналі */
+.abox-cap{
+  height: 20px;
+  background: linear-gradient(180deg, var(--auth-blue-2), var(--auth-blue-3));
+  position: relative;
+}
+.abox-cap .cap-line{
+  position:absolute; left:14px; right:14px; bottom:-10px; height:10px;
+  border-radius: 0 0 12px 12px;
+  background: #f4f2f8;
+  box-shadow: inset 0 0 0 2px #cbd4de;
+}
+
+/* форма */
+.abox-form{ padding: 12px 14px 10px; position: relative; }
+.abox-row{ display:flex; align-items:center; gap:8px; margin:6px 0; }
+.abox-label{
+  min-width: 105px;
+  color:#149; font-weight:800;
+}
+.abox-input{
+  flex:1;
+  height: 24px;
+  border-radius: 3px;
+  border: 1px solid #b7c3ce;
+  background: #fdfdfb;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba(0,0,0,.05);
+  padding: 2px 6px;
+  font-size: 14px;
+  color: var(--text);
+}
+.abox-input:focus{
+  outline: none;
+  border-color: var(--auth-blue-2);
+  box-shadow: 0 0 0 2px rgba(30,154,215,.15);
+}
+
+/* кнопка login */
+.btn-login{
+  display:inline-block;
+  padding: 4px 16px 6px;
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(180deg, #ff8bcf, #ff3aa9);
+  color:#fff; font-weight:900; letter-spacing:.3px;
+  box-shadow: 0 4px 0 #c62686, 0 8px 14px rgba(255,48,159,.35);
+  cursor:pointer;
+  transition: transform .05s ease-in-out;
+}
+.btn-login:active{ transform: translateY(1px); }
+
+/* забув пароль */
+.abox-forgot{
+  margin: 8px 0 4px 114px;
+  font-size: 14px;
+  color:#c2279a;
+}
+.abox-forgot a{ color:#c2279a; text-decoration:none; }
+.abox-forgot a:hover{ text-decoration:underline; }
+.abox-forgot .arrow{
+  color:#c2279a; font-size: 18px; vertical-align:-2px; margin-right:4px;
+}
+
+/* котик */
+.abox-cat{
+  position:absolute; left: 14px; bottom: 58px;
+  width: 86px; height: auto; pointer-events:none;
+}
+
+/* промо-блок */
+.abox-promo{
+  border-top: 2px solid #e6d6e9;
+  background-size: cover; background-position: center;
+  padding: 8px; 
+}
+.promo-inner{
+  position: relative;
+  border: 2px solid #ff3aa9;
+  border-radius: 10px;
+  background: rgba(255,255,255,.85);
+  padding: 10px;
+}
+.promo-copy .p-small{
+  color:#6a6a6a; font-weight:800; line-height:1.15;
+}
+.promo-copy .p-big{
+  margin-top: 6px;
+  color:#333; font-weight:800; line-height:1.1;
+}
+.promo-copy .p-big strong{ color:#ff2f98; }
+
+.promo-pet{
+  position:absolute; right: 10px; top: -14px;
+  width: 78px; height:auto;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.15));
+}
+
+/* кнопка sign up */
+.btn-signup{
+  position:absolute; right: 12px; bottom: 8px;
+  display:inline-block;
+  padding: 4px 14px 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff8bcf, #ff3aa9);
+  color:#fff; font-weight:900; text-decoration:none;
+  box-shadow: 0 4px 0 #c62686;
+}
+.btn-signup:active{ transform: translateY(1px); }
+
+/* дрібні адаптації */
+@media (max-width: 340px){
+  .abox{ width:100%; }
+}

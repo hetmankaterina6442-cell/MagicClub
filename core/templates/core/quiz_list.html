@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Тести{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h2 class="section-title">Тести</h2>
+
+  <div class="qgrid">
+    {% for q in quizzes %}
+    <article class="qtile">
+      <a href="#" class="qtile-cover js-quiz-start"
+         data-url="{% url 'core:quiz_get' q.slug %}">
+        {% if q.image_url %}
+          <img src="{{ q.image_url }}" alt="{{ q.title }}">
+        {% else %}
+          <img src="{% static 'core/img/quiz/sample.jpg' %}" alt="{{ q.title }}">
+        {% endif %}
+        <span class="qtile-play" aria-hidden="true"></span>
+      </a>
+      <h3 class="qtile-title">{{ q.title }}</h3>
+      {% if q.subtitle %}<p class="qtile-sub">{{ q.subtitle }}</p>{% endif %}
+    </article>
+    {% empty %}
+      <p class="muted">Поки що немає активних тестів.</p>
+    {% endfor %}
+  </div>
+
+  <!-- assets попапа -->
+  <div id="quiz-assets"
+       data-b-sprite="{% static 'core/img/quiz/sfondo_paginazione2_test.png' %}"
+       data-steps-bg="{% static 'core/img/quiz/sfondo_paginazione_test.png' %}"
+       data-close-sprite="{% static 'core/img/quiz/ico_chiudi_poll.png' %}">
+  </div>
+
+  <!-- попап для запуску тесту (той самий, що на головній) -->
+  <div id="quizbox">
+    <div class="qb-back"></div>
+    <div class="qb-dialog" role="dialog" aria-modal="true" aria-labelledby="qbTitle">
+      <div class="qb-head">
+        <h3 id="qbTitle" style="margin:0">Квіз</h3>
+        <button class="qb-close" aria-label="Закрити"></button>
+      </div>
+      <div class="qb-body"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  const assetsEl = document.getElementById('quiz-assets');
+  const B_ON  = assetsEl.dataset.bSprite;
+  const CLOSE = assetsEl.dataset.closeSprite;
+
+  const qb = document.getElementById('quizbox');
+  const qbBody = qb.querySelector('.qb-body');
+  const qbClose = qb.querySelector('.qb-close');
+  qbClose.style.backgroundImage = `url(${CLOSE})`;
+
+  const state = { quiz:null, i:0, picks:{} };
+
+  function openBox(){ qb.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeBox(){ qb.classList.remove('open'); document.body.style.overflow=''; qbBody.innerHTML=''; state.quiz=null; state.i=0; state.picks={}; }
+  qb.querySelector('.qb-back').addEventListener('click', closeBox);
+  qbClose.addEventListener('click', closeBox);
+
+  function t(s){ s=Math.max(0,Math.floor(s||0)); const m=Math.floor(s/60), r=s%60; return m+':'+String(r).padStart(2,'0'); }
+
+  function renderProgress(){
+    const total = state.quiz.questions.length;
+    let out = '<div class="qb-progress">';
+    for(let k=0;k<total;k++){ out += `<img class="qb-butter" src="${B_ON}" alt="${k+1}/${total}">`; }
+    out += '</div>'; return out;
+  }
+
+  function renderFinish() {
+  // 1) чи є хоч одне питання з is_correct -> режим тесту
+  let examMode = false;
+  let totalCorrect = 0;
+  const totalQuestions = state.quiz.questions.length;
+
+  for (const q of state.quiz.questions) {
+    const pickedId = state.picks[q.id];
+    const picked = (q.answers || []).find(a => a.id === pickedId);
+    if ((q.answers || []).some(a => a.is_correct)) examMode = true;
+    if (picked && picked.is_correct === true) totalCorrect += 1;
+  }
+
+  let resultBlock = '';
+
+  if (!examMode) {
+    // 2) типологічний режим — рахуємо найчастіший код
+    const counter = {};
+    for (const q of state.quiz.questions) {
+      const pickedId = state.picks[q.id];
+      const picked = (q.answers || []).find(a => a.id === pickedId);
+      if (!picked) continue;
+      const code = (picked.code || '').trim().toUpperCase();
+      if (!code) continue;
+      counter[code] = (counter[code] || 0) + 1;
+    }
+    let bestCode = null, bestCount = -1;
+    Object.entries(counter).forEach(([code, cnt]) => {
+      if (cnt > bestCount) { bestCode = code; bestCount = cnt; }
+    });
+
+    const found = (state.quiz.results || []).find(
+      r => r.code.toUpperCase() === (bestCode || '')
+    );
+
+    // Завжди показуємо «Дякуємо!» + результат
+    resultBlock =
+      '<div class="qb-res" style="text-align:center">' +
+        '<div class="qb-thanks" style="font-size:22px;font-weight:900;color:#8d1fa1;margin:4px 0 8px">Дякую! 💜</div>' +
+        (found && found.image
+          ? '<div><img src="'+found.image+'" style="max-width:100%;border-radius:10px;border:1px solid #ffd2ef;margin-bottom:8px"></div>'
+          : '') +
+        '<div class="qb-title" style="font-weight:900;color:#8d1fa1;font-size:20px;margin:4px 0">'
+          + (found ? found.title : ('Твій результат: ' + (bestCode || '—'))) +
+        '</div>' +
+      '</div>';
+  } else {
+    // 3) іспитовий режим — бал/кількість
+    resultBlock =
+      '<div class="qb-res" style="text-align:center">' +
+        '<div class="qb-thanks" style="font-size:22px;font-weight:900;color:#8d1fa1;margin:4px 0 8px">💜</div>' +
+        '<div style="font-weight:900;color:#8d1fa1;font-size:20px;margin:6px 0">Твій результат</div>' +
+        '<div class="badge" style="display:inline-block;padding:8px 12px;border-radius:999px;background:#ffe7f5;border:1px solid #ffd2ef;color:#a02caa;font-weight:900;">'
+          + totalCorrect + ' / ' + totalQuestions +
+        '</div>' +
+      '</div>';
+  }
+
+  qbBody.innerHTML =
+    '<div class="qb-finish" style="display:flex;flex-direction:column;gap:12px;align-items:center">' +
+      renderProgress() +
+      resultBlock +
+      '<div><button class="btn qb-close2">Закрити</button></div>' +
+    '</div>';
+
+  qbBody.querySelector('.qb-close2').addEventListener('click', () => {
+    const lb = document.getElementById('quizbox');
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+}
+
+  function renderQuestion(){
+    const q = state.quiz.questions[state.i];
+    if(!q){ renderFinish(); return; }
+    const img = q.image ? `<div style="text-align:center;margin:8px 0;"><img src="${q.image}" style="max-width:100%;border-radius:8px;border:1px solid #ffd2ef"></div>` : '';
+    const opts = (q.answers||[]).map(a => `
+      <label class="qb-opt" data-aid="${a.id}">
+        ${a.image ? `<img src="${a.image}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #ffd2ef">` : ''}
+        <span>${a.text||'Варіант'}</span>
+      </label>`).join('');
+
+    qbBody.innerHTML = `<div class="qb-wrap">
+      ${renderProgress()}
+      <div class="qb-qtitle">${q.text||'Питання'}</div>
+      ${img}
+      <div class="qb-answers">${opts}</div>
+      <div class="qb-actions">
+        <button class="btn qb-prev" ${state.i===0?'disabled':''}>Назад</button>
+        <button class="btn qb-next">Далі</button>
+      </div>
+    </div>`;
+
+    const answersEls = Array.from(qbBody.querySelectorAll('.qb-opt'));
+    answersEls.forEach(el => el.addEventListener('click', ()=>{
+      answersEls.forEach(e=>e.classList.remove('active'));
+      el.classList.add('active');
+      state.picks[q.id] = parseInt(el.dataset.aid,10);
+    }));
+    qbBody.querySelector('.qb-prev').addEventListener('click', ()=>{ if(state.i>0){ state.i--; renderQuestion(); } });
+    qbBody.querySelector('.qb-next').addEventListener('click', ()=>{
+      if(!state.picks[q.id]){ alert('Оберіть відповідь 🙂'); return; }
+      if(state.i < state.quiz.questions.length-1){ state.i++; renderQuestion(); } else { renderFinish(); }
+    });
+  }
+
+  async function openQuiz(url){
+    const r = await fetch(url, {headers:{'X-Requested-With':'XMLHttpRequest'}});
+    const j = await r.json();
+    if(!j.ok || !j.quiz){ alert('Не вдалося завантажити тест'); return; }
+    state.quiz = j.quiz; state.i = 0; state.picks = {};
+    openBox(); renderQuestion();
+  }
+
+  document.querySelectorAll('.js-quiz-start').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.preventDefault();
+      openQuiz(btn.dataset.url);
+    });
+  });
+})();
+</script>
+{% endblock %}

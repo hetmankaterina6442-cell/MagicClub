@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ game.title }} — Гра{% endblock %}
+
+{% block content %}
+<main class="container">
+  <article class="card">
+    <div class="card-head"><span>{{ game.title }}</span></div>
+    {% if game.description %}<p class="muted">{{ game.description }}</p>{% endif %}
+
+    <div id="game-wrap" class="video-frame" style="aspect-ratio: {{ game.width }}/{{ game.height }}">
+      <embed id="ruffle-player"
+             src="{{ game.swf_file.url }}"
+             width="100%" height="100%">
+    </div>
+  </article>
+</main>
+
+{# Ruffle #}
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<script>
+  window.RufflePlayer = window.RufflePlayer || {};
+  window.RufflePlayer.config = { autoplay: "on", unmuteOverlay: "hidden" };
+</script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Winx Wonderland — головна{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/theme.css' %}">
+</head>
+
+<body>
+<header class="site-header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="{% url 'core:home' %}" class="brand logo" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <!-- <span class="butterfly"></span> -->
+        <img src="{% static 'core/img/logowinx4season.png' %}" width="80px" alt="" srcset="">
+        <span>Winx <span>Wonderland</span></span>
+      </a>
+
+      <nav class="main-nav">
+        {# використовуємо app_name, щоб підсвітити активний пункт #}
+        {% with app=request.resolver_match.app_name|default:'' %}
+          <a href="{% url 'core:home' %}"
+             class="nav-link {% if app == 'core' %}active{% endif %}"><img src="{% static 'core/img/home.png' %}" width="25px" alt="" srcset=""> Головна</a>
+
+          <a href="{% url 'core:home' %}"
+             class="nav-link {% if app == 'core' %}active{% endif %}">Форум</a>
+            
+          <a href="{% url 'core:home' %}"
+             class="nav-link {% if app == 'core' %}active{% endif %}">Статті</a>
+
+          <a href="{% url 'videos:categories' %}"
+             class="nav-link {% if app == 'videos' %}active{% endif %}">Відео</a>
+
+          <a href="{% url 'games:theme_list' %}"
+             class="nav-link {% if app == 'games' %}active{% endif %}">Ігри</a>
+
+          <a href="{% url 'gallery:album_list' %}"
+             class="nav-link {% if app == 'gallery' %}active{% endif %}">Галерея</a>
+        {% endwith %}
+      </nav>
+    </div>
+  </div>
+</header>
+
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© {{ now|date:"Y" }} Фейрі Клуб — фан‑сайт українською. Дизайн натхнений оригіналом.</p>
+      <nav class="footer-nav">
+        <a href="#">Правила</a>
+        <a href="#">Контакти</a>
+        <a href="#">FAQ</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="{% static 'core/js/main.js' %}"></script>
+</body>
+
+</html>

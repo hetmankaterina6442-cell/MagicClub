@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ theme.title }} — Категорії{% endblock %}
+{% block content %}
+<main class="container">
+  <div class="card">
+    <div class="card-head"><span>{{ theme.title }}</span></div>
+    {% if theme.description %}<p class="muted">{{ theme.description }}</p>{% endif %}
+  </div>
+
+  <h2 class="section-title">Категорії</h2>
+  <div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+    {% for c in categories %}
+      <a class="card" href="{% url 'games:category_detail' theme.slug c.slug %}" style="text-decoration:none">
+        {% if c.icon %}<img src="{{ c.icon.url }}" alt="" class="promo-img" style="aspect-ratio:16/9;object-fit:cover">{% endif %}
+        <h3 class="post-title" style="margin-top:8px">{{ c.title }}</h3>
+        <div class="meta"><span class="badge">{{ c.games.count }} ігор</span></div>
+      </a>
+    {% empty %}
+      <p class="muted">У цій тематиці ще немає категорій.</p>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

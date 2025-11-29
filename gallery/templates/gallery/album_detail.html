@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}{{ album.title }} — Альбом{% endblock %}
+
+{% block content %}
+<main class="container">
+  <article class="card">
+    <div class="card-head"><span>{{ album.title }}</span></div>
+    {% if album.description %}<p class="muted">{{ album.description }}</p>{% endif %}
+
+    <div class="photo-grid">
+      {% for p in photos %}
+        <a href="{{ p.image.url }}" class="photo-item" data-fullsrc="{{ p.image.url }}" data-caption="{{ p.caption|default_if_none:'' }}">
+          <img src="{{ p.image.url }}" alt="{{ p.caption }}" loading="lazy" class="js-zoom">
+          {% if p.caption %}<span class="photo-cap">{{ p.caption }}</span>{% endif %}
+        </a>
+      {% empty %}
+        <p class="muted">У цьому альбомі ще немає фото.</p>
+      {% endfor %}
+    </div>
+  </article>
+</main>
+
+{# Лайтбокс створимо динамічно JS-ом, але на випадок без JS — нічого не показуємо #}
+<script>
+(function () {
+  const items = Array.from(document.querySelectorAll('.photo-item'));
+  if (!items.length) return;
+
+  // Створюємо lightbox один раз (використовує стилі #lightbox з твого theme.css)
+  function ensureLightbox() {
+    let lb = document.getElementById('lightbox');
+    if (lb) return lb;
+
+    lb = document.createElement('div');
+    lb.id = 'lightbox';
+    lb.innerHTML =
+      '<div class="lb-backdrop"></div>' +
+      '<div class="lb-dialog" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);">' +
+        '<button class="lb-close" aria-label="Закрити" title="Закрити">×</button>' +
+        '<button class="lb-prev" aria-label="Попереднє фото" title="Попереднє" ' +
+          'style="position:absolute;left:6px;top:50%;transform:translateY(-50%);' +
+                 'min-width:40px;height:40px;border-radius:50%;border:1px solid #ffd2ef;' +
+                 'background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.15);font-size:22px;line-height:1;">‹</button>' +
+        '<button class="lb-next" aria-label="Наступне фото" title="Наступне" ' +
+          'style="position:absolute;right:6px;top:50%;transform:translateY(-50%);' +
+                 'min-width:40px;height:40px;border-radius:50%;border:1px solid #ffd2ef;' +
+                 'background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.15);font-size:22px;line-height:1;">›</button>' +
+        '<img class="lb-image" alt="" />' +
+        '<div class="lb-caption" style="padding:8px 12px;text-align:center;color:#8d1fa1;font-weight:700;"></div>' +
+      '</div>';
+    document.body.appendChild(lb);
+    return lb;
+  }
+
+  // Дані про зображення
+  const gallery = items.map(a => ({
+    src: a.dataset.fullsrc || a.getAttribute('href'),
+    cap: a.dataset.caption || a.querySelector('.photo-cap')?.textContent || a.querySelector('img')?.alt || ''
+  }));
+
+  let idx = 0;
+  let open = false;
+  let lb, imgEl, capEl;
+
+  function render() {
+    if (!lb) return;
+    const item = gallery[idx];
+    imgEl.src = item.src;
+    imgEl.alt = item.cap;
+    capEl.textContent = item.cap || '';
+  }
+
+  function openBox(startIndex) {
+    idx = startIndex;
+    lb = ensureLightbox();
+    imgEl = lb.querySelector('.lb-image');
+    capEl = lb.querySelector('.lb-caption');
+
+    // зробимо картинку акуратною
+    imgEl.style.maxWidth = '90vw';
+    imgEl.style.maxHeight = '75vh';
+    imgEl.style.display = 'block';
+    imgEl.style.borderRadius = '12px';
+    imgEl.style.border = '1px solid #ffd2ef';
+    imgEl.style.boxShadow = '0 20px 60px rgba(0,0,0,.25)';
+    imgEl.style.margin = '8px auto 0';
+
+    render();
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    open = true;
+  }
+
+  function closeBox() {
+    if (!lb) return;
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    open = false;
+  }
+
+  function prev() { idx = (idx - 1 + gallery.length) % gallery.length; render(); }
+  function next() { idx = (idx + 1) % gallery.length; render(); }
+
+  // Клік по картках — відкриття
+  items.forEach((a, i) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      openBox(i);
+    });
+  });
+
+  // Делегуємо події lightbox
+  document.addEventListener('click', (e) => {
+    const el = e.target;
+    const lbRoot = document.getElementById('lightbox');
+    if (!lbRoot || !lbRoot.classList.contains('open')) return;
+
+    if (el.classList.contains('lb-backdrop') || el.classList.contains('lb-close')) {
+      closeBox();
+    } else if (el.classList.contains('lb-prev')) {
+      prev();
+    } else if (el.classList.contains('lb-next') || el.classList.contains('lb-image')) {
+      // клік по зображенню теж листає вперед
+      next();
+    }
+  });
+
+  // Клавіатура
+  document.addEventListener('keydown', (e) => {
+    if (!open) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeBox(); }
+  });
+})();
+</script>
+{% endblock %}

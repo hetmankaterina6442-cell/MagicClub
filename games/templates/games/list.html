@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ category.title }} — Ігри{% endblock %}
+{% block content %}
+<h1 class="section-title">{{ category.title }}</h1>
+<div class="cards">
+  {% for g in items %}
+    <a href="{% url 'games:detail' g.slug %}" class="card post" style="text-decoration:none;">
+      {% if g.cover %}<img src="{{ g.cover.url }}" class="post-thumb" style="object-fit:cover;">{% else %}
+      <div class="post-thumb alt"></div>{% endif %}
+      <div class="post-body">
+        <h3 class="post-title">{{ g.title }}</h3>
+        <p class="muted">{{ g.description|truncatewords:24 }}</p>
+        <div class="meta"><span class="badge">Ruffle</span><span class="dot"></span><span>{{ g.created_at|date:"j E Y" }}</span></div>
+      </div>
+    </a>
+  {% empty %}
+    <p class="muted">У цій категорії поки немає ігор.</p>
+  {% endfor %}
+</div>
+{% endblock %}

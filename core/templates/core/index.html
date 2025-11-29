@@ -1,0 +1,769 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Фейрі Клуб — Головна{% endblock %}
+
+{% block content %}
+<!-- <section class="grid">
+  <aside class="col col-3 sidebar">
+
+
+    <div class="card promo">
+      <div class="card-head"><span>Гра дня</span></div>
+      <img src="https://placehold.co/600x400" alt="" class="promo-img">
+      <div class="card-actions"><a href="#" class="btn">Грати</a></div>
+    </div>
+  </aside>
+</section> -->
+
+<div class="card-grid">
+  {% for c in cards %}
+  <figure class="winx-card" style="background-color: {{ c.bg_color }};">
+    <div class="stack">
+      <!-- Порядок шарів важливий -->
+      <img class="layer wings" src="{{ c.wings.url }}" alt="{{ c.name }} wings">
+      <img class="layer body" src="{{ c.body.url }}" alt="{{ c.name }}">
+      <img class="layer frame" src="{{ c.frame.url }}" alt="{{ c.name }} frame">
+      <figcaption class="badge" style="background: {{ c.effective_badge_color }};">{{ c.name }}</figcaption>
+    </div>
+  </figure>
+  {% empty %}
+  <p class="muted">Додайте картки Winx у адмін-панелі, щоб побачити сітку.</p>
+  {% endfor %}
+</div>
+
+
+
+<section class="grid mt-4">
+
+
+
+  <aside class="col col-3">
+    {# === LOGIN / WELCOME CARD === #}
+    {% if request.user.is_authenticated %}
+    <div class="welcome-card">
+      <div class="wc-arc wc-arc-top"></div>
+
+      <div class="wc-panel">
+        <div class="wc-user">
+          <img class="wc-avatar"
+            src="{% with p=request.user.profile|default_if_none:'' %}{% if p and p.avatar %}{{ p.avatar.url }}{% else %}{% static 'profiles/default_avatar.png' %}{% endif %}{% endwith %}"
+            alt="Аватар">
+          <div class="wc-hello">
+            Вітаємо,
+            <strong>
+              {% with p=request.user.profile|default_if_none:'' %}
+              {{ p.display_name|default:request.user.username }}
+              {% endwith %}
+            </strong>!
+          </div>
+        </div>
+
+        <div class="wc-actions">
+          <a class="wc-btn" href="{% url 'profiles:me' %}">Мій профіль</a>
+          {% if user.is_authenticated %}
+          <form method="post" action="{% url 'profiles:logout' %}?next=/" style="display:inline">
+            {% csrf_token %}
+            <button class="wc-logout" style="background:none;border:0;cursor:pointer">
+              Вийти
+            </button>
+          </form>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <div class="wc-arc wc-arc-bottom"></div>
+    </div>
+    {% else %}
+    {# ваш попередній блок входу — залишаємо як є #}
+    <div class="login-card">
+      <div class="lc-arc lc-arc-top"></div>
+      <div class="lc-panel" style="height:280px;">
+        <form class="lc-form" method="post" action="{% url 'authbox:login' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <label class="lc-label lc-l-user" for="lc-user">Ім'я феї:</label>
+          <input class="lc-input lc-i-user" id="lc-user" type="text" name="username" required>
+          <label class="lc-label lc-l-pass" for="lc-pass">Пароль:</label>
+          <input class="lc-input lc-i-pass" id="lc-pass" type="password" name="password" required>
+          <img class="lc-mascot" style="width:110px;" src="{% static 'core/authbox/mascot-login.png' %}" alt="">
+          <br><br>
+          <button class="lc-btn" type="submit">Увійти</button><br>
+          <a class="lc-forgot" href="#">› Я забув свої дані</a>
+        </form>
+      </div>
+      <div class="lc-arc lc-arc-bottom"></div>
+      <div class="lc-signup">
+        <div class="lcs-bg" style="height:298px;">
+          <div class="lcs-text">
+            <div class="t1" style="height:25px;width:300px;">Ще не</div>
+            <div class="t1" style="height:32px;width:110px;">приєдналися до нас ?</div>
+            <div class="t2">Реєструйтесь зараз з <strong>Winx Club</strong></div>
+          </div>
+          <img class="lcs-mascot" src="{% static 'core/authbox/Image 59.png' %}" alt="">
+          <a class="lcs-btn" href="{% url 'profiles:register' %}">Зареєструватися</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
+
+
+    {% if poll %}
+    <div class="poll-card">
+      <div class="poll-head"><span>Опитування</span></div>
+
+      <form class="poll-body" data-vote-url="{% url 'core:poll_vote' poll.slug %}"
+        data-results-url="{% url 'core:poll_results' poll.slug %}">
+        {% csrf_token %}
+
+        <div class="poll-question">{{ poll.question }}</div>
+
+        <div class="poll-box">
+          {% if poll.image %}
+          <img class="poll-img" src="{{ poll.image.url }}" alt="">
+          {% endif %}
+
+          <div class="poll-options">
+            {% for o in poll.options.all %}
+            <label class="poll-opt">
+              <input type="radio" name="option" value="{{ o.id }}">
+              <span class="poll-radio"></span>
+              <span class="poll-text">{{ o.text }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <a href="#" class="poll-results-link">Результати</a>
+        <button type="submit" class="poll-send">Відправити</button>
+      </form>
+    </div>
+    {% endif %}
+
+
+
+
+
+
+
+
+  </aside>
+
+  <div class="col col-6">
+    {% load static %}
+
+    {% static 'core/img/hero.png' as HERO_POSTER %}
+
+    {% if latest_videos %}
+
+
+    <div class="video-hero card">
+      <div class="vh-frame">
+        <img id="vhPoster" src="{{ latest_videos.0.poster_url|default_if_none:HERO_POSTER }}"
+          alt="{{ latest_videos.0.title }}">
+        <button id="vhPlay" class="vh-play" type="button"
+          data-kind="{% if latest_videos.0.is_youtube %}yt{% else %}file{% endif %}"
+          data-src="{{ latest_videos.0.player_url }}" aria-label="Відтворити"></button>
+      </div>
+
+      <div class="vh-meta">
+        <h3 id="vhTitle" class="vh-title">{{ latest_videos.0.title }}</h3>
+
+        <div class="vh-dots">
+          {% for v in latest_videos %}
+          <button class="butter-dot {% if forloop.first %}active{% endif %}" type="button"
+            data-kind="{% if v.is_youtube %}yt{% else %}file{% endif %}" data-src="{{ v.player_url }}"
+            data-thumb="{{ v.poster_url|default_if_none:HERO_POSTER }}" data-title="{{ v.title|escape }}">
+            <img src="{% static 'core/img/butterfly_1.png' %}" alt="">
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <script>
+      (function () {
+        const poster = document.getElementById('vhPoster');
+        const playBtn = document.getElementById('vhPlay');
+        const titleEl = document.getElementById('vhTitle');
+        const dots = Array.from(document.querySelectorAll('.butter-dot'));
+
+        // Активуємо поточну "крапку"
+        function activate(btn) {
+          if (!btn) return;
+          dots.forEach(d => d.classList.remove('active'));
+          btn.classList.add('active');
+
+          // Оновлюємо постер, заголовок і дані для плеєра
+          if (btn.dataset.thumb) poster.src = btn.dataset.thumb;
+          if (btn.dataset.title) titleEl.textContent = btn.dataset.title;
+          if (btn.dataset.src) playBtn.dataset.src = btn.dataset.src;
+          playBtn.dataset.kind = btn.dataset.kind || 'file';
+        }
+
+        // Клік по крапках
+        dots.forEach(btn => btn.addEventListener('click', () => activate(btn)));
+
+        // Синхронізуємо початкові дані з активною крапкою (або першою)
+        const initial = document.querySelector('.butter-dot.active') || dots[0];
+        if (initial) {
+          // не ламай вже відрендерений постер, лише переконайся що kind/src правильні
+          playBtn.dataset.kind = initial.dataset.kind || playBtn.dataset.kind || 'file';
+          if (!playBtn.dataset.src && initial.dataset.src) playBtn.dataset.src = initial.dataset.src;
+        }
+
+        // Лайтбокс (один на сторінку)
+        function ensureLightbox() {
+          if (document.getElementById('lightbox')) return;
+          const lb = document.createElement('div');
+          lb.id = 'lightbox';
+          lb.innerHTML =
+            '<div class="lb-backdrop"></div>' +
+            '<div class="lb-dialog">' +
+            '  <button class="lb-close" aria-label="Закрити">×</button>' +
+            '  <div class="lb-body"></div>' +
+            '</div>';
+          document.body.appendChild(lb);
+
+          const close = lb.querySelector('.lb-close');
+          lb.querySelector('.lb-backdrop').addEventListener('click', closeBox);
+          close.addEventListener('click', closeBox);
+
+          function closeBox() {
+            // Стоп локальне відео
+            const v = lb.querySelector('video');
+            if (v) { v.pause(); v.src = ""; v.load(); }
+
+            // Стоп YouTube: просто прибираємо src (інакше грає у фоні)
+            const f = lb.querySelector('iframe');
+            if (f) { f.src = ""; }
+
+            lb.classList.remove('open');
+          }
+        }
+
+        // Формат часу (00:00)
+        const t = s => {
+          s = Math.max(0, Math.floor(s || 0));
+          const m = Math.floor(s / 60);
+          const r = s % 60;
+          return m + ':' + String(r).padStart(2, '0');
+        };
+
+        // Відтворення
+        playBtn.addEventListener('click', () => {
+          ensureLightbox();
+          const lb = document.getElementById('lightbox');
+          const body = lb.querySelector('.lb-body');
+
+          const kind = (playBtn.dataset.kind || 'file').toLowerCase();
+          const src = playBtn.dataset.src;
+
+          if (!src) return;
+
+          if (kind === 'yt') {
+            // YouTube: показуємо тільки iframe (без кастомних контролів)
+            body.innerHTML =
+              '<div class="wc-player" style="position:relative;padding-top:56.25%;background:#000;border-radius:12px;overflow:hidden;">' +
+              '<iframe src="' + src + '" ' +
+              'title="YouTube video" ' +
+              'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+              'allowfullscreen ' +
+              'style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>' +
+              '</div>';
+            lb.classList.add('open');
+            return;
+          }
+
+          // Локальне відео з кастомними контролами
+          body.innerHTML =
+            '<div class="wc-player">' +
+            '<video id="wcVideo" src="' + src + '" preload="metadata"></video>' +
+            '<div class="wc-controls">' +
+            '<button class="wc-play" aria-label="Play/Pause"></button>' +
+            '<span class="wc-time">0:00</span>' +
+            '<input type="range" class="wc-seek" min="0" max="100" value="0">' +
+            '<span class="wc-right">-0:00</span>' +
+            '<button class="wc-mute" aria-label="Mute/Unmute"></button>' +
+            '<input type="range" class="wc-vol" min="0" max="1" step="0.01" value="1">' +
+            '</div>' +
+            '</div>';
+
+          lb.classList.add('open');
+
+          const video = body.querySelector('#wcVideo');
+          const play = body.querySelector('.wc-play');
+          const seek = body.querySelector('.wc-seek');
+          const cur = body.querySelector('.wc-time');
+          const left = body.querySelector('.wc-right');
+          const mute = body.querySelector('.wc-mute');
+          const vol = body.querySelector('.wc-vol');
+
+          function updateSeek() {
+            const pct = (video.currentTime / (video.duration || 1)) * 100;
+            seek.value = pct;
+            seek.style.setProperty('--pos', pct + '%');
+            cur.textContent = t(video.currentTime);
+            left.textContent = '-' + t((video.duration || 0) - video.currentTime);
+          }
+          function toggle() {
+            if (video.paused) { video.play(); play.classList.add('is-pause'); }
+            else { video.pause(); play.classList.remove('is-pause'); }
+          }
+
+          video.addEventListener('loadedmetadata', updateSeek);
+          video.addEventListener('timeupdate', updateSeek);
+          video.addEventListener('play', () => play.classList.add('is-pause'));
+          video.addEventListener('pause', () => play.classList.remove('is-pause'));
+          play.addEventListener('click', toggle);
+
+          seek.addEventListener('input', () => {
+            video.currentTime = (seek.value / 100) * (video.duration || 0);
+            updateSeek();
+          });
+
+          mute.addEventListener('click', () => {
+            video.muted = !video.muted;
+            mute.style.opacity = video.muted ? .5 : 1;
+          });
+          vol.addEventListener('input', () => {
+            video.volume = parseFloat(vol.value);
+            video.muted = video.volume === 0;
+            mute.style.opacity = video.muted ? .5 : 1;
+          });
+
+          // автозапуск (ігноруємо помилку, якщо заблоковано)
+          video.play().catch(() => { });
+
+          // гарячі клавіші на один раз
+          const onKey = (e) => {
+            if (e.key === ' ') { e.preventDefault(); toggle(); }
+            if (e.key === 'Escape') {
+              const close = document.querySelector('#lightbox .lb-close');
+              if (close) close.click();
+            }
+          };
+          document.addEventListener('keydown', onKey, { once: true });
+        });
+      })();
+    </script>
+
+
+    {% endif %}
+
+
+
+    <div class="articles-grid">
+      {% for item in articles %}
+      <a href="{% url 'core:post_detail' item.slug %}" class="article-card">
+        <!-- верхня “плашка” -->
+        <div class="ac-head">
+          <span class="ac-label">СТАТТЯ</span>
+          <img class="ac-ico" src="{% static 'core/img/ui/pencil.png' %}" alt="">
+        </div>
+
+        <!-- тіло картки -->
+        <div class="ac-body">
+          <h3 class="ac-title">{{ item.title }}</h3>
+          <p class="ac-lead">{{ item.summary|default:item.body|truncatewords:22 }}</p>
+
+          <div class="ac-thumb" {% if item.cover %} style="background-image:url('{{ item.cover.image.url }}')" {% endif %}>
+          </div>
+
+          <div class="ac-meta">
+            <span class="badge-article badge-orange">Стаття</span>
+            <span class="dot"></span>
+            <time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"j E Y" }}</time>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <p class="muted">Додайте кілька «Статей» в адмінці, щоб побачити картки.</p>
+      {% endfor %}
+    </div>
+
+
+
+  </div>
+
+  <aside class="col col-3">
+
+
+
+
+    {# === GAME OF THE DAY === #}
+    <div class="gtile">
+      <div class="gtile-fold">
+        <span class="gtile-head">ІГРИ</span>
+        <img class="gtile-pad" src="{% static 'core/img/ui/gamepad.png' %}" alt="">
+      </div>
+
+      <div class="gtile-body">
+        <h3 class="gtile-title">
+          {{ featured_game.title|default:"Гра дня" }}
+        </h3>
+
+        <div class="gtile-thumb" {% if featured_game and featured_game.cover %}
+          style="background-image:url('{{ featured_game.cover.url }}')" {% else %}
+          style="background-image:url('{% static 'core/img/placeholders/game.jpg' %}')" {% endif %}>
+        </div>
+
+        <div class="gtile-actions">
+          {% if featured_game %}
+          <a class="gtile-btn" href="{% url 'games:game_detail' featured_game.slug %}">Грати</a>
+          {% else %}
+          <span class="muted">Додайте гру в адмінці</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+
+
+    {% static 'core/img/quiz/sample.png' as QUIZ_SAMPLE %}
+    <div class="quiz-tile">
+      <div class="qt-inner">
+        <strong class="qt-head">ТЕСТ</strong>
+
+        <img class="qt-qmarks" src="{% static 'core/img/quiz/qmarks.png' %}" alt="?">
+
+        <h3 class="qt-title">
+          {{ featured_quiz.title|default:"Що ти кажеш усмішкою?" }}
+        </h3>
+
+        <div class="qt-collage">
+          <img class="qt-photo p1" src="{{ featured_quiz.image_url|default:QUIZ_SAMPLE }}" alt="">
+          <img class="qt-photo p2" src="{{ featured_quiz.image_url|default:QUIZ_SAMPLE }}" alt="">
+          <img class="qt-photo p3" src="{{ featured_quiz.image_url|default:QUIZ_SAMPLE }}" alt="">
+          <img class="qt-lips" src="{% static 'core/img/quiz/sfondo_paginazione_test.png' %}" alt="">
+        </div>
+
+        <a class="qt-start js-quiz-start" data-rand-url="{% url 'core:quiz_random' %}"
+          data-submit-url="{% url 'core:quiz_submit' %}">
+          Почати
+        </a>
+      </div>
+    </div>
+
+
+
+    <!-- статичні шляхи до картинок квіза -->
+    <div id="quiz-assets" data-b-sprite="{% static 'core/img/quiz/sfondo_paginazione2_test.png' %}"
+      data-steps-bg="{% static 'core/img/quiz/sfondo_paginazione_test.png' %}"
+      data-close-sprite="{% static 'core/img/quiz/ico_chiudi_poll.png' %}">
+    </div>
+
+    <div id="quizbox">
+      <div class="qb-back"></div>
+      <div class="qb-dialog" role="dialog" aria-modal="true" aria-labelledby="qbTitle">
+        <div class="qb-head">
+          <h3 id="qbTitle" style="margin:0">Квіз</h3>
+          <!-- кнопка закриття без <img> — фон із твого PNG-спрайта -->
+          <button class="qb-close" aria-label="Закрити"></button>
+        </div>
+        <div class="qb-body"><!-- контент JS-ом --></div>
+      </div>
+    </div>
+
+    <script>
+      // Клік по будь-якому місцю плитки — запускає тест
+      document.addEventListener('click', (e) => {
+        const tile = e.target.closest('.quiz-tile');
+        if (!tile) return;
+        const btn = tile.querySelector('.js-quiz-start');
+        if (btn) btn.click();
+      });
+    </script>
+
+
+    <script>
+      (function () {
+        // кнопка «Почати»
+        const startBtn = document.querySelector('.js-quiz-start');
+        if (!startBtn) return;
+
+        // assets з <div id="quiz-assets" ...>
+        const assetsEl = document.getElementById('quiz-assets');
+        const B_ON = assetsEl?.dataset.bOn || "{% static 'core/img/quiz/sfondo_paginazione2_test.png' %}";
+        const B_OFF = assetsEl?.dataset.bOff || "{% static 'core/img/quiz/sfondo_paginazione_test.png' %}";
+        const CLOSE = assetsEl?.dataset.close || "{% static 'core/img/quiz/ico_chiudi_poll.png' %}";
+
+        // попап
+        const qb = document.getElementById('quizbox');
+        const qbBody = qb.querySelector('.qb-body');
+        const qbClose = qb.querySelector('.qb-close');
+        const qbTitle = document.getElementById('qbTitle');
+        qbClose.innerHTML = '<img alt="close" src="' + CLOSE + '">';
+
+        // стан
+        const state = {
+          quiz: null,       // сюди прилетить quiz-обʼєкт з бекенду
+          i: 0,             // індекс поточного питання
+          picks: {},        // question_id -> answer_id
+          score: 0          // для режиму is_correct
+        };
+
+        function openBox() {
+          qb.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+        function closeBox() {
+          qb.classList.remove('open');
+          document.body.style.overflow = '';
+          qbBody.innerHTML = '';
+          Object.assign(state, { quiz: null, i: 0, picks: {}, score: 0 });
+        }
+        qb.querySelector('.qb-back').addEventListener('click', closeBox);
+        qbClose.addEventListener('click', closeBox);
+
+        function ensureQuizValid(qz) {
+          if (!qz || !Array.isArray(qz.questions)) return false;
+          return qz.questions.length > 0;
+        }
+
+        // верхній індикатор (метелики)
+        function renderProgress() {
+          const total = state.quiz.questions.length;
+          const parts = [];
+          for (let k = 0; k < total; k++) {
+            parts.push(
+              '<img class="qb-butter" ' +
+              'src="' + (k <= state.i ? B_ON : B_OFF) + '" ' +
+              'alt="' + (k + 1) + '/' + total + '" ' +
+              'style="width:28px;height:28px;object-fit:contain">'
+            );
+          }
+          return '<div class="qb-progress" style="display:flex;gap:6px;align-items:center;justify-content:center;margin-bottom:10px;">'
+            + parts.join('') + '</div>';
+        }
+
+        function renderQuestion() {
+          const q = state.quiz.questions[state.i];
+          if (!q) { // якщо індекс вийшов за межі — фініш
+            return renderFinish();
+          }
+
+          const answers = Array.isArray(q.answers) ? q.answers : [];
+          const img = q.image ? '<div style="text-align:center;margin:8px 0;"><img src="' + q.image + '" style="max-width:100%;border-radius:8px;border:1px solid #ffd2ef"></div>' : '';
+
+          // відповіді: можуть бути з картинкою або лише текст
+          const opts = answers.map(a => {
+            const hasImg = !!a.image;
+            return (
+              '<label class="qb-opt" data-aid="' + a.id + '" style="display:flex;gap:10px;align-items:center;padding:8px;border:1px solid #ffd2ef;border-radius:10px;margin:6px 0;cursor:pointer;background:#fff">' +
+              (hasImg ? '<img src="' + a.image + '" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #ffd2ef">' : '') +
+              '<span style="font-weight:700;color:#8d1fa1">' + (a.text || 'Варіант') + '</span>' +
+              '</label>'
+            );
+          }).join('');
+
+          qbBody.innerHTML =
+            '<div class="qb-wrap" style="display:flex;flex-direction:column;gap:8px">' +
+            renderProgress() +
+            '<div class="qb-qtitle" style="font-weight:900;color:#8d1fa1;font-size:20px;">' + (q.text || 'Питання') + '</div>' +
+            img +
+            '<div class="qb-answers">' + opts + '</div>' +
+            '<div class="qb-actions" style="display:flex;justify-content:space-between;gap:8px;margin-top:8px">' +
+            '<button class="btn qb-prev" ' + (state.i === 0 ? 'disabled' : '') + '>Назад</button>' +
+            '<button class="btn qb-next">Далі</button>' +
+            '</div>' +
+            '</div>';
+
+          // інтеракція
+          const answersEls = Array.from(qbBody.querySelectorAll('.qb-opt'));
+          answersEls.forEach(el => el.addEventListener('click', () => {
+            answersEls.forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+            const aid = parseInt(el.dataset.aid, 10);
+            state.picks[q.id] = aid;
+
+            // якщо це тест із правильними — оновимо score на льоту
+            const picked = (q.answers || []).find(a => a.id === aid);
+            if (picked && picked.is_correct) {
+              // уникаємо “подвійного” додавання — перерахуємо під час finish
+            }
+          }));
+
+          qbBody.querySelector('.qb-prev').addEventListener('click', () => {
+            if (state.i > 0) { state.i -= 1; renderQuestion(); }
+          });
+
+          qbBody.querySelector('.qb-next').addEventListener('click', () => {
+            // якщо не обрано відповідь на це питання — не рухаємось
+            if (!state.picks[q.id]) {
+              alert('Обери відповідь 🙂');
+              return;
+            }
+            // наступне питання або фініш
+            if (state.i < state.quiz.questions.length - 1) {
+              state.i += 1;
+              renderQuestion();
+            } else {
+              renderFinish();
+            }
+          });
+        }
+
+        function renderFinish() {
+          // 1) якщо є is_correct у відповідях — іспитовий режим
+          let examMode = false;
+          let totalCorrect = 0;
+          let totalQuestions = state.quiz.questions.length;
+
+          for (const q of state.quiz.questions) {
+            const pickedId = state.picks[q.id];
+            const picked = (q.answers || []).find(a => a.id === pickedId);
+            if (picked && (picked.is_correct === true)) {
+              examMode = true;
+              totalCorrect += 1;
+            }
+            // якщо бодай в одному питанні є is_correct True/False — вважаємо “іспит”
+            if ((q.answers || []).some(a => a.is_correct)) {
+              examMode = true;
+            }
+          }
+
+          // 2) інакше — типологічний режим (A/B/C …)
+          let resultBlock = '';
+          if (!examMode) {
+            const counter = {};
+            for (const q of state.quiz.questions) {
+              const pickedId = state.picks[q.id];
+              const picked = (q.answers || []).find(a => a.id === pickedId);
+              if (!picked) continue;
+              const code = (picked.code || '').trim().toUpperCase();
+              if (!code) continue;
+              counter[code] = (counter[code] || 0) + 1;
+            }
+            // знайдемо найчастіший код
+            let bestCode = null, bestCount = -1;
+            Object.entries(counter).forEach(([code, cnt]) => {
+              if (cnt > bestCount) { bestCode = code; bestCount = cnt; }
+            });
+            const found = (state.quiz.results || []).find(r => r.code.toUpperCase() === (bestCode || ''));
+            if (found) {
+              resultBlock =
+                '<div class="qb-res" style="text-align:center">' +
+                (found.image ? '<div><img src="' + found.image + '" style="max-width:100%;border-radius:10px;border:1px solid #ffd2ef;margin-bottom:8px"></div>' : '') +
+                '<div style="font-weight:900;color:#8d1fa1;font-size:22px;margin:6px 0">' + (found.title || ('Результат: ' + bestCode)) + '</div>' +
+                '</div>';
+            } else {
+              resultBlock = '<div class="qb-res" style="text-align:center;font-weight:800;color:#8d1fa1">Готово! 💜</div>';
+            }
+          } else {
+            resultBlock =
+              '<div class="qb-res" style="text-align:center">' +
+              '<div style="font-weight:900;color:#8d1fa1;font-size:22px;margin:6px 0">Результат</div>' +
+              '<div class="badge" style="display:inline-block;padding:8px 12px;border-radius:999px;background:#ffe7f5;border:1px solid #ffd2ef;color:#a02caa;font-weight:900;">' +
+              totalCorrect + ' / ' + totalQuestions +
+              '</div>' +
+              '</div>';
+          }
+
+          qbBody.innerHTML =
+            '<div class="qb-finish" style="display:flex;flex-direction:column;gap:12px;align-items:center">' +
+            renderProgress() +
+            resultBlock +
+            '<div><button class="btn qb-close2">Закрити</button></div>' +
+            '</div>';
+
+          qbBody.querySelector('.qb-close2').addEventListener('click', closeBox);
+
+          // Якщо потрібно відправляти на бекенд (наприклад, збереження результату),
+          // тут зроби fetch(startBtn.dataset.submitUrl, {method:'POST', body: JSON.stringify({...})})
+        }
+
+        async function startQuiz() {
+          try {
+            const url = startBtn.dataset.randUrl;
+            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!res.ok) throw new Error('Server ' + res.status);
+            const data = await res.json();
+            if (!data.ok || !data.quiz) throw new Error('Bad payload');
+            if (!ensureQuizValid(data.quiz)) {
+              qbBody.innerHTML = '<p class="muted">Немає питань у цьому квізі.</p>';
+              openBox();
+              return;
+            }
+            state.quiz = data.quiz;
+            state.i = 0;
+            state.picks = {};
+            state.score = 0;
+
+            qbTitle.textContent = data.quiz.title || 'Квіз';
+            openBox();
+            renderQuestion();
+          } catch (e) {
+            console.error(e);
+            alert('Не вдалося завантажити тест. Перевір дані квізу в адмінці.');
+          }
+        }
+
+        startBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          startQuiz();
+        });
+      })();
+    </script>
+
+
+
+
+
+  </aside>
+
+
+  <script>
+    (function () {
+      const card = document.querySelector('.poll-card');
+      if (!card) return;
+      const form = card.querySelector('form');
+      const voteURL = form.dataset.voteUrl;
+      const resURL = form.dataset.resultsUrl;
+
+      function barHTML(o) {
+        return `
+      <div class="poll-bar">
+        <div class="poll-bar-fill" style="width:${o.pct}%"></div>
+        <div class="poll-bar-label"><strong>${o.pct}%</strong> — ${o.text}</div>
+      </div>`;
+      }
+      function renderResults(payload) {
+        const box = card.querySelector('.poll-box');
+        const opts = payload.options.map(barHTML).join('');
+        box.innerHTML = `
+      <div class="poll-results">
+        ${opts}
+        <div class="poll-total">Total: ${payload.total}</div>
+      </div>`;
+        card.classList.add('is-results');
+      }
+
+      card.querySelector('.poll-results-link').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const r = await fetch(resURL);
+        const j = await r.json();
+        if (j.ok) renderResults(j.results);
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        if (!fd.get('option')) { alert('Оберіть варіант 🙂'); return; }
+        const r = await fetch(voteURL, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const j = await r.json();
+        if (j.results) renderResults(j.results);
+      });
+    })();
+  </script>
+
+
+
+
+</section>
+{% endblock %}

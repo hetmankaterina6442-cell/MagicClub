@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ game.title }} — Грати{% endblock %}
+{% block content %}
+<main class="container">
+  <article class="card">
+    <h1 class="article-title">{{ game.title }}</h1>
+    <div id="ruffle" style="max-width:100%;">
+      <script src="{% static 'ruffle/ruffle.js' %}"></script>
+      <div id="gameHost" style="width:{{ game.width }}px; max-width:100%;">
+        <embed src="{{ game.swf_file.url }}" width="{{ game.width }}" height="{{ game.height }}">
+      </div>
+    </div>
+  </article>
+</main>
+{% endblock %}

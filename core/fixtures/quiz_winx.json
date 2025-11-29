@@ -1,0 +1,68 @@
+[
+  {
+    "model": "core.quiz",
+    "pk": 101,
+    "fields": {
+      "title": "Яка ти фея Winx?",
+      "slug": "yaka-ty-feya-winx",
+      "subtitle": "Відповідай і дізнайся, хто з Winx тобі ближче!",
+      "image_url": "",
+      "is_active": true,
+      "shuffle_questions": true,
+      "shuffle_answers": true,
+      "created_at": "2025-11-01T12:00:00Z"
+    }
+  },
+
+  { "model": "core.quizresult", "pk": 10101, "fields": {
+      "quiz": 101, "code": "A", "title": "Bloom",
+      "image": "", "order": 1
+  }},
+  { "model": "core.quizresult", "pk": 10102, "fields": {
+      "quiz": 101, "code": "B", "title": "Stella",
+      "image": "", "order": 2
+  }},
+  { "model": "core.quizresult", "pk": 10103, "fields": {
+      "quiz": 101, "code": "C", "title": "Flora",
+      "image": "", "order": 3
+  }},
+
+  { "model": "core.quizquestion", "pk": 10111, "fields": {
+      "quiz": 101, "text": "Який настрій у тебе найчастіше?", "image": "", "order": 1
+  }},
+  { "model": "core.quizanswer", "pk": 101111, "fields": {
+      "question": 10111, "text": "Запальний і рішучий", "image": "", "code": "A", "is_correct": false, "order": 1
+  }},
+  { "model": "core.quizanswer", "pk": 101112, "fields": {
+      "question": 10111, "text": "Яскравий і грайливий", "image": "", "code": "B", "is_correct": false, "order": 2
+  }},
+  { "model": "core.quizanswer", "pk": 101113, "fields": {
+      "question": 10111, "text": "Спокійний і теплий",  "image": "", "code": "C", "is_correct": false, "order": 3
+  }},
+
+  { "model": "core.quizquestion", "pk": 10112, "fields": {
+      "quiz": 101, "text": "Який колір тобі ближчий?", "image": "", "order": 2
+  }},
+  { "model": "core.quizanswer", "pk": 101121, "fields": {
+      "question": 10112, "text": "Червоний / Помаранчевий", "image": "", "code": "A", "is_correct": false, "order": 1
+  }},
+  { "model": "core.quizanswer", "pk": 101122, "fields": {
+      "question": 10112, "text": "Жовтий / Золотий",       "image": "", "code": "B", "is_correct": false, "order": 2
+  }},
+  { "model": "core.quizanswer", "pk": 101123, "fields": {
+      "question": 10112, "text": "Зелений / Пастельний",   "image": "", "code": "C", "is_correct": false, "order": 3
+  }},
+
+  { "model": "core.quizquestion", "pk": 10113, "fields": {
+      "quiz": 101, "text": "Що ти робиш у вільний час?", "image": "", "order": 3
+  }},
+  { "model": "core.quizanswer", "pk": 101131, "fields": {
+      "question": 10113, "text": "Роблю щось сміливе / складне", "image": "", "code": "A", "is_correct": false, "order": 1
+  }},
+  { "model": "core.quizanswer", "pk": 101132, "fields": {
+      "question": 10113, "text": "Спілкуюся, розважаюсь, творю стиль", "image": "", "code": "B", "is_correct": false, "order": 2
+  }},
+  { "model": "core.quizanswer", "pk": 101133, "fields": {
+      "question": 10113, "text": "Надихаюсь природою, малюю, читаю",   "image": "", "code": "C", "is_correct": false, "order": 3
+  }}
+]

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Галерея — Альбоми{% endblock %}
+
+{% block content %}
+<main class="container">
+  <section class="grid">
+    <aside class="col col-3">
+      <div class="card">
+        <div class="card-head"><span>Категорії</span></div>
+        <ul class="plain">
+          <li><a href="{% url 'gallery:album_list' %}">Усі</a></li>
+          {% for c in categories %}
+            <li><a href="{% url 'gallery:album_by_category' c.slug %}">{{ c.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </aside>
+
+    <div class="col col-9">
+      <h2 class="section-title">
+        {% if active_category %}Альбоми — {{ active_category.title }}{% else %}Усі альбоми{% endif %}
+      </h2>
+
+      <div class="album-grid">
+        {% for a in albums %}
+          <a href="{% url 'gallery:album_detail' a.pk %}" class="card album-card">
+            <div class="album-cover">
+              {% if a.get_cover_url %}
+                <img src="{{ a.get_cover_url }}" alt="{{ a.title }}" loading="lazy">
+              {% endif %}
+            </div>
+            <h3 class="post-title">{{ a.title }}</h3>
+            {% if a.description %}<p class="muted">{{ a.description|truncatewords:18 }}</p>{% endif %}
+            <div class="meta"><span class="badge">{{ a.photos.count }} фото</span></div>
+          </a>
+        {% empty %}
+          <p class="muted">Немає альбомів.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

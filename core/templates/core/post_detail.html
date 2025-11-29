@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ article.title }} — Стаття{% endblock %}
+
+{% block content %}
+<main class="container">
+  <article class="article card">
+    <header class="article-head">
+      <div class="labels">
+        <span class="badge badge-orange">Стаття</span>
+        <span class="dot"></span>
+        <time datetime="{{ article.created_at|date:'c' }}">{{ article.created_at|date:"j E Y" }}</time>
+      </div>
+      <h1 class="article-title">{{ article.title }}</h1>
+      {% if article.summary %}
+      <p class="article-lead">{{ article.summary }}</p>
+      {% endif %}
+    </header>
+
+    {% if article.cover %}
+    <figure class="figure hero">
+      <img src="{{ article.cover.image.url }}" alt="{{ article.cover.alt|default_if_none:'' }}" class="js-zoom"
+        data-fullsrc="{{ article.cover.image.url }}">
+    </figure>
+    {% endif %}
+
+    <section class="article-body">
+      {{ article.body|safe }}
+
+      {% with pics=article.images.all|slice:"1:" %}
+      {% if pics %}
+      <div class="article-alternating">
+        {% for pic in pics %}
+        <div class="article-row {% if forloop.counter|divisibleby:2 %}rev{% endif %}"
+          style="--img: {{ pic.width_percent|default:50 }}%;">
+          <figure class="figure article-figure">
+            <img src="{{ pic.image.url }}" alt="{{ pic.alt }}" class="js-zoom article-img"
+              data-fullsrc="{{ pic.image.url }}">
+          </figure>
+          <div class="article-desc">
+            {% if pic.alt %}
+            <h4 class="article-img-title">{{ pic.alt }}</h4>
+            {% endif %}
+            {# тут можна вивести додатковий підпис, якщо додаси поле caption #}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+    </section>
+
+    <footer class="article-foot">
+      <nav class="article-pager">
+        {% if prev_item %}<a class="btn" href="{% url 'core:post_detail' prev_item.slug %}">← Попередня</a>{% endif %}
+        {% if next_item %}<a class="btn" href="{% url 'core:post_detail' next_item.slug %}">Наступна →</a>{% endif %}
+      </nav>
+    </footer>
+  </article>
+
+</main>
+
+{% include "core/_comments.html" %}
+{% endblock %}

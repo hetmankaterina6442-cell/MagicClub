@@ -1,0 +1,15 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'authbox/authbox.css' %}">
+<div class="abox abox-signup-page">
+  <h3 class="abox-title">Create your Winx account</h3>
+  <form method="post" class="abox-signup-form">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {{ form.non_field_errors }}
+    <label>Fairy Name</label>{{ form.username }}
+    <label>Email (optional)</label>{{ form.email }}
+    <label>Password</label>{{ form.password1 }}
+    <label>Password (again)</label>{{ form.password2 }}
+    <button class="abox-btn-login" type="submit">sign up</button>
+  </form>
+</div>
