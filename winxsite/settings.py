@@ -98,3 +98,10 @@ TEMPLATES[0]["OPTIONS"]["context_processors"] += [
 # Якщо працюєш за проксі/HTTPS — можеш увімкнути:
 # SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # USE_X_FORWARDED_HOST = True
+
+STATIC_URL = '/static/'
+MEDIA_URL  = '/media/'
+
+STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']   # як у тебе
+STATIC_ROOT = BASE_DIR / 'staticfiles'              # опційно (для collectstatic)
+MEDIA_ROOT  = BASE_DIR / 'media'
